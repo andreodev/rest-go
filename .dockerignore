@@ -1,0 +1,9 @@
+.git
+.idea
+.vscode
+tmp
+dist
+bin
+coverage.out
+Dockerfile
+docker-compose.yml
