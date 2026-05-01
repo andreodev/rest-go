@@ -6,12 +6,7 @@ import (
 )
 
 type Users struct {
-	users []models.User
-	db    *sql.DB
-}
-
-func NewMemory() *Users {
-	return &Users{users: make([]models.User, 0)}
+	db *sql.DB
 }
 
 func NewPostgres(db *sql.DB) *Users {
@@ -19,10 +14,6 @@ func NewPostgres(db *sql.DB) *Users {
 }
 
 func (u Users) GetAll() ([]models.User, error) {
-	if u.db == nil {
-		return u.users, nil
-	}
-
 	rows, err := u.db.Query(`
 		SELECT id, name, email
 		FROM users
@@ -51,38 +42,55 @@ func (u Users) GetAll() ([]models.User, error) {
 }
 
 func (u Users) EmailExist(email string) (bool, error) {
-	if u.db != nil {
-		var exists bool
-		err := u.db.QueryRow(`
-			SELECT EXISTS(
-				SELECT 1
-				FROM users
-				WHERE email = $1
-			)
-		`, email).Scan(&exists)
+	var exists bool
+	err := u.db.QueryRow(`
+		SELECT EXISTS(
+			SELECT 1
+			FROM users
+			WHERE email = $1
+		)
+	`, email).Scan(&exists)
 
-		return exists, err
-	}
-
-	for _, user := range u.users {
-		if user.Email == email {
-			return true, nil
-		}
-	}
-
-	return false, nil
+	return exists, err
 }
 
 func (u *Users) Add(newUser models.User) error {
-	if u.db != nil {
-		_, err := u.db.Exec(`
-			INSERT INTO users (id, name, email)
-			VALUES ($1, $2, $3)
-		`, newUser.ID, newUser.Name, newUser.Email)
+	_, err := u.db.Exec(`
+		INSERT INTO users (id, name, email)
+		VALUES ($1, $2, $3)
+	`, newUser.ID, newUser.Name, newUser.Email)
 
+	return err
+}
+
+func (u *Users) DeleteById(id string) error {
+	result, err := u.db.Exec(`
+		DELETE FROM users
+		WHERE id = $1
+	`, id)
+	if err != nil {
 		return err
 	}
 
-	u.users = append(u.users, newUser)
+	rows, err := result.RowsAffected()
+
+	if err != nil {
+		return err
+	}
+
+	if rows == 0 {
+		return sql.ErrNoRows
+	}
 	return nil
+}
+
+func (u Users) GetById(id string) (models.User, error) {
+	var user models.User
+	err := u.db.QueryRow(`
+		SELECT id, name, email
+		FROM users
+		WHERE id = $1
+	`, id).Scan(&user.ID, &user.Name, &user.Email)
+
+	return user, err
 }

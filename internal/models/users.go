@@ -15,3 +15,12 @@ type UserCreateRequest struct {
 type UserCreateResponse struct {
 	NewUserID uuid.UUID `json:"newUserId"`
 }
+
+type UserDeleteRequest struct {
+	Id uuid.UUID `json:"id"`
+}
+
+type UserDeleteResponse struct {
+	Message string    `json:"message"`
+	ID      uuid.UUID `json:"id"`
+}

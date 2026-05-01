@@ -18,11 +18,14 @@ import (
 )
 
 func main() {
-	db := openDatabase()
-	if db != nil {
-		defer db.Close()
-		runMigrations(db)
-	}
+	databaseURL := getDatabaseURL()
+
+	migrationDB := openDatabase(databaseURL)
+	runMigrations(migrationDB)
+	migrationDB.Close()
+
+	db := openDatabase(databaseURL)
+	defer db.Close()
 
 	repos := repositories.New(db)
 
@@ -36,13 +39,17 @@ func main() {
 	}
 }
 
-func openDatabase() *sql.DB {
+func getDatabaseURL() string {
 	databaseURL := os.Getenv("DATABASE_URL")
 	if databaseURL == "" {
-		slog.Info("DATABASE_URL not set, using in-memory repositories")
-		return nil
+		slog.Error("DATABASE_URL is required")
+		os.Exit(1)
 	}
 
+	return databaseURL
+}
+
+func openDatabase(databaseURL string) *sql.DB {
 	db, err := sql.Open("pgx", databaseURL)
 	if err != nil {
 		slog.Error("failed to open database", "err", err)

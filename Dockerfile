@@ -8,6 +8,19 @@ RUN go mod download
 COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o /api ./cmd/api
 
+FROM golang:1.26-alpine AS dev
+
+WORKDIR /app
+
+RUN go install github.com/air-verse/air@latest
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+EXPOSE 8080
+
+CMD ["air", "-c", ".air.toml"]
+
 FROM alpine:3.22
 
 WORKDIR /app

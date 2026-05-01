@@ -53,3 +53,22 @@ func (u UseCases) AddUser(newUser models.UserCreateRequest) (uuid.UUID, error) {
 
 	return repoReq.ID, nil
 }
+
+func (u UseCases) DeleteUserById(id string) error {
+	if err := u.repos.User.DeleteById(id); err != nil {
+		slog.Error("failed to delete user", "id", id, "err", err)
+		return err
+	}
+
+	return nil
+}
+
+func (u UseCases) GetUserById(id string) (models.User, error) {
+	user, err := u.repos.User.GetById(id)
+	if err != nil {
+		slog.Error("failed to get user by id", "id", id, "err", err)
+		return models.User{}, err
+	}
+
+	return user, nil
+}
