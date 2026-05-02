@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
-
 	"rest-go/internal/models"
+	userModels "rest-go/internal/models/users"
 
 	"github.com/google/uuid"
 )
@@ -32,7 +32,7 @@ func (h Handlers) getAllUsers(w http.ResponseWriter, r *http.Request) {
 
 func (h Handlers) createUser(w http.ResponseWriter, r *http.Request) {
 
-	var req models.UserCreateRequest
+	var req userModels.UserCreateRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -50,7 +50,7 @@ func (h Handlers) createUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(models.UserCreateResponse{NewUserID: id})
+	json.NewEncoder(w).Encode(userModels.UserCreateResponse{NewUserID: id})
 }
 
 func (h Handlers) deleteUserById(w http.ResponseWriter, r *http.Request) {
@@ -73,7 +73,7 @@ func (h Handlers) deleteUserById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(models.UserDeleteResponse{
+	json.NewEncoder(w).Encode(userModels.UserDeleteResponse{
 		Message: "user deleted successfully",
 		ID:      id,
 	})
@@ -110,7 +110,7 @@ func getUserIDFromRequest(r *http.Request) (uuid.UUID, error) {
 		return uuid.Parse(id)
 	}
 
-	var req models.UserDeleteRequest
+	var req userModels.UserDeleteRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return uuid.Nil, errors.New("invalid request body")
 	}

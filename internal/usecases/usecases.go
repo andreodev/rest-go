@@ -3,7 +3,7 @@ package usecases
 import (
 	"errors"
 	"log/slog"
-	"rest-go/internal/models"
+	userModels "rest-go/internal/models/users"
 	"rest-go/internal/repositories"
 
 	"github.com/google/uuid"
@@ -17,7 +17,7 @@ func New(repos *repositories.Repositories) *UseCases {
 	return &UseCases{repos: repos}
 }
 
-func (u UseCases) GetAllUsers() ([]models.User, error) {
+func (u UseCases) GetAllUsers() ([]userModels.User, error) {
 	users, err := u.repos.User.GetAll()
 	if err != nil {
 		slog.Error("failed to get users", "err", err)
@@ -27,7 +27,7 @@ func (u UseCases) GetAllUsers() ([]models.User, error) {
 	return users, nil
 }
 
-func (u UseCases) AddUser(newUser models.UserCreateRequest) (uuid.UUID, error) {
+func (u UseCases) AddUser(newUser userModels.UserCreateRequest) (uuid.UUID, error) {
 
 	exist, err := u.repos.User.EmailExist(newUser.Email)
 	if err != nil {
@@ -40,7 +40,7 @@ func (u UseCases) AddUser(newUser models.UserCreateRequest) (uuid.UUID, error) {
 		return uuid.Nil, errors.New("email already exist")
 	}
 
-	repoReq := models.User{
+	repoReq := userModels.User{
 		ID:    uuid.New(),
 		Name:  newUser.Name,
 		Email: newUser.Email,
@@ -63,11 +63,11 @@ func (u UseCases) DeleteUserById(id string) error {
 	return nil
 }
 
-func (u UseCases) GetUserById(id string) (models.User, error) {
+func (u UseCases) GetUserById(id string) (userModels.User, error) {
 	user, err := u.repos.User.GetById(id)
 	if err != nil {
 		slog.Error("failed to get user by id", "id", id, "err", err)
-		return models.User{}, err
+		return userModels.User{}, err
 	}
 
 	return user, nil

@@ -5,11 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"rest-go/internal/models"
+	userModels "rest-go/internal/models/users"
 )
 
 func main() {
-	req := models.UserCreateRequest{
+	req := userModels.UserCreateRequest{
 		Name:  "John Doe",
 		Email: "john.doe@example.com",
 	}
@@ -30,7 +30,7 @@ func main() {
 		panic("erro to created user")
 	}
 
-	var responseApi models.UserCreateResponse
+	var responseApi userModels.UserCreateResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&responseApi); err != nil {
 		panic(err)

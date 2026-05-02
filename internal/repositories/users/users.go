@@ -2,7 +2,7 @@ package users
 
 import (
 	"database/sql"
-	"rest-go/internal/models"
+	userModels "rest-go/internal/models/users"
 )
 
 type Users struct {
@@ -13,7 +13,7 @@ func NewPostgres(db *sql.DB) *Users {
 	return &Users{db: db}
 }
 
-func (u Users) GetAll() ([]models.User, error) {
+func (u Users) GetAll() ([]userModels.User, error) {
 	rows, err := u.db.Query(`
 		SELECT id, name, email
 		FROM users
@@ -24,10 +24,10 @@ func (u Users) GetAll() ([]models.User, error) {
 	}
 	defer rows.Close()
 
-	users := make([]models.User, 0)
+	users := make([]userModels.User, 0)
 
 	for rows.Next() {
-		var user models.User
+		var user userModels.User
 		if err := rows.Scan(&user.ID, &user.Name, &user.Email); err != nil {
 			return nil, err
 		}
@@ -54,7 +54,7 @@ func (u Users) EmailExist(email string) (bool, error) {
 	return exists, err
 }
 
-func (u *Users) Add(newUser models.User) error {
+func (u *Users) Add(newUser userModels.User) error {
 	_, err := u.db.Exec(`
 		INSERT INTO users (id, name, email)
 		VALUES ($1, $2, $3)
@@ -84,8 +84,8 @@ func (u *Users) DeleteById(id string) error {
 	return nil
 }
 
-func (u Users) GetById(id string) (models.User, error) {
-	var user models.User
+func (u Users) GetById(id string) (userModels.User, error) {
+	var user userModels.User
 	err := u.db.QueryRow(`
 		SELECT id, name, email
 		FROM users
