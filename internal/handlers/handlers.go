@@ -17,6 +17,7 @@ func New(useCases *usecases.UseCases) *Handlers {
 
 func (h Handlers) Listen(port int) error {
 	h.registerUserEndpoints()
+	h.registerProductEndpoints()
 
 	slog.Info("server is listening", "port", port)
 

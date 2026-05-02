@@ -19,7 +19,7 @@ func (h Handlers) registerUserEndpoints() {
 }
 
 func (h Handlers) getAllUsers(w http.ResponseWriter, r *http.Request) {
-	users, err := h.useCases.GetAllUsers()
+	users, err := h.useCases.Users.GetAll()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(models.ErrorResponse{Reason: err.Error()})
@@ -40,7 +40,7 @@ func (h Handlers) createUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := h.useCases.AddUser(req)
+	id, err := h.useCases.Users.Add(req)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -61,7 +61,7 @@ func (h Handlers) deleteUserById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.useCases.DeleteUserById(id.String()); err != nil {
+	if err := h.useCases.Users.DeleteById(id.String()); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			w.WriteHeader(http.StatusNotFound)
 			json.NewEncoder(w).Encode(models.ErrorResponse{Reason: "user not found"})
@@ -87,7 +87,7 @@ func (h Handlers) getUserById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.useCases.GetUserById(id.String())
+	user, err := h.useCases.Users.GetById(id.String())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			w.WriteHeader(http.StatusNotFound)
