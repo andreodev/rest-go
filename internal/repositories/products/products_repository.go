@@ -3,5 +3,7 @@ package products
 import productModels "rest-go/internal/models/products"
 
 type ProductRepository interface {
-	GetAll() ([]productModels.Product, error)
+	GetAll(limit, offset int) ([]productModels.Product, error)
+	Count() (int, error)
+	Create(productModels.Product) error
 }
