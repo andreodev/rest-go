@@ -56,3 +56,15 @@ func (p ProductsUseCase) Create(newProduct productModels.CreateProductRequest) (
 
 	return productModels.CreateProductResponse{ID: repoReq.ID}, nil
 }
+
+func (p ProductsUseCase) FindByID(id string) (productModels.Product, error) {
+	product, err := p.repo.FindByID(id)
+
+	if err != nil {
+		slog.Error("Failed to get product by id", "id", id, "err", err)
+
+		return productModels.Product{}, err
+	}
+
+	return product, nil
+}

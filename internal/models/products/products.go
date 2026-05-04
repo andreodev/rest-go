@@ -30,3 +30,11 @@ type CreateProductResponse struct {
 	Description string    `json:"description"`
 	CreatedAt   string    `json:"created_at"`
 }
+
+type ProductByIDResponse struct {
+	ID          uuid.UUID `json:"id"`
+	NameProduct string    `json:"name_product"`
+	Price       float64   `json:"price"`
+	Description string    `json:"description"`
+	CreatedAt   string    `json:"created_at"`
+}

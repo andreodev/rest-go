@@ -70,3 +70,21 @@ func (p *Products) Create(newProduct productModels.Product) error {
 
 	return err
 }
+
+func (p Products) FindByID(id string) (productModels.Product, error) {
+	var product productModels.Product
+
+	err := p.db.QueryRow(`
+		SELECT id, name_product, price, description, created_at
+		FROM products
+		WHERE id = $1
+	`, id).Scan(
+		&product.ID,
+		&product.NameProduct,
+		&product.Price,
+		&product.Description,
+		&product.CreatedAt,
+	)
+
+	return product, err
+}
