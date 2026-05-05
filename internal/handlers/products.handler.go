@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"io"
 	"net/http"
 	"rest-go/internal/models"
 	productModels "rest-go/internal/models/products"
@@ -15,6 +17,7 @@ import (
 func (h Handlers) registerProductEndpoints() {
 	http.HandleFunc("GET /products", h.getAllProducts)
 	http.HandleFunc("POST /products", h.createProduct)
+	http.HandleFunc("PUT /products/{id}", h.updateProductByID)
 	http.HandleFunc("GET /products/{id}", h.getProductByID)
 	http.HandleFunc("DELETE /products/{id}", h.deleteProductByID)
 }
@@ -158,4 +161,45 @@ func (h Handlers) deleteProductByID(w http.ResponseWriter, r *http.Request) {
 		Message: "product deleted successfully",
 		ID:      id,
 	})
+}
+
+func (h Handlers) updateProductByID(w http.ResponseWriter, r *http.Request) {
+	id, err := getProductIDFromRequest(r)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(models.ErrorResponse{Reason: err.Error()})
+		return
+	}
+
+	var req productModels.ProductUpdateRequest
+
+	bodyBytes, err := io.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(models.ErrorResponse{Reason: "invalid request body"})
+		return
+	}
+
+	fmt.Println("Request body:", string(bodyBytes))
+
+	if err := json.Unmarshal(bodyBytes, &req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(models.ErrorResponse{Reason: "invalid request body"})
+		return
+	}
+
+	if err := h.useCases.Products.UpdateByID(id.String(), req); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(models.ErrorResponse{Reason: "product not found"})
+			return
+		}
+
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(models.ErrorResponse{Reason: err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(productModels.ProductUpdateResponse{ID: id, NameProduct: req.NameProduct, Price: req.Price, Description: req.Description})
 }

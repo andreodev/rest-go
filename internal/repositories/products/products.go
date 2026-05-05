@@ -2,6 +2,7 @@ package products
 
 import (
 	"database/sql"
+	"fmt"
 	productModels "rest-go/internal/models/products"
 )
 
@@ -106,6 +107,36 @@ func (p *Products) DeleteByID(id string) error {
 	}
 
 	if row == 0 {
+		return sql.ErrNoRows
+	}
+
+	return nil
+}
+
+func (p *Products) UpdateByID(id string, data productModels.Product) error {
+	if p.db == nil {
+		return fmt.Errorf("database not initialized")
+	}
+
+	query := `
+		UPDATE products
+		SET name_product = $1, price = $2, description = $3
+		WHERE id = $4
+	`
+
+	result, err := p.db.Exec(query, data.NameProduct, data.Price, data.Description, id)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	fmt.Printf("rows affected: %d", rowsAffected)
+
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
 		return sql.ErrNoRows
 	}
 

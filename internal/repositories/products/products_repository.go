@@ -8,4 +8,5 @@ type ProductRepository interface {
 	Create(productModels.Product) error
 	FindByID(id string) (productModels.Product, error)
 	DeleteByID(id string) error
+	UpdateByID(id string, data productModels.Product) error
 }

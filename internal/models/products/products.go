@@ -43,3 +43,16 @@ type ProductDeleteResponse struct {
 	ID      uuid.UUID `json:"id"`
 	Message string    `json:"message"`
 }
+
+type ProductUpdateRequest struct {
+	NameProduct string  `json:"name_product"`
+	Price       float64 `json:"price"`
+	Description string  `json:"description"`
+}
+
+type ProductUpdateResponse struct {
+	ID          uuid.UUID `json:"id"`
+	NameProduct string    `json:"name_product"`
+	Price       float64   `json:"price"`
+	Description string    `json:"description"`
+}

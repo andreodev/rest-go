@@ -1,6 +1,7 @@
 package usecases
 
 import (
+	"fmt"
 	"log/slog"
 	productModels "rest-go/internal/models/products"
 	productRepo "rest-go/internal/repositories/products"
@@ -72,6 +73,24 @@ func (p ProductsUseCase) FindByID(id string) (productModels.Product, error) {
 func (p ProductsUseCase) DeleteByID(id string) error {
 	if err := p.repo.DeleteByID(id); err != nil {
 		slog.Error("FAILED TO DELETE PRODUCT", "id", id, "err", err)
+		return err
+	}
+
+	return nil
+}
+
+func (p ProductsUseCase) UpdateByID(id string, data productModels.ProductUpdateRequest) error {
+	productData := productModels.Product{
+		NameProduct: data.NameProduct,
+		Price:       data.Price,
+		Description: data.Description,
+	}
+
+	fmt.Printf("Updating product with ID: %s\n", id)
+	fmt.Printf("Product data: %+v\n", productData)
+
+	if err := p.repo.UpdateByID(id, productData); err != nil {
+		slog.Error("FAILED TO UPDATE PRODUCT", "id", id, "err", err)
 		return err
 	}
 
