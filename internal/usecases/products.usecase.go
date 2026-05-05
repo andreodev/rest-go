@@ -68,3 +68,12 @@ func (p ProductsUseCase) FindByID(id string) (productModels.Product, error) {
 
 	return product, nil
 }
+
+func (p ProductsUseCase) DeleteByID(id string) error {
+	if err := p.repo.DeleteByID(id); err != nil {
+		slog.Error("FAILED TO DELETE PRODUCT", "id", id, "err", err)
+		return err
+	}
+
+	return nil
+}

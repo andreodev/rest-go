@@ -88,3 +88,26 @@ func (p Products) FindByID(id string) (productModels.Product, error) {
 
 	return product, err
 }
+
+func (p *Products) DeleteByID(id string) error {
+	result, err := p.db.Exec(`
+	  DELETE FROM products
+	  WHERE id = $1
+	`, id)
+
+	if err != nil {
+		return err
+	}
+
+	row, err := result.RowsAffected()
+
+	if err != nil {
+		return err
+	}
+
+	if row == 0 {
+		return sql.ErrNoRows
+	}
+
+	return nil
+}

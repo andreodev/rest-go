@@ -7,4 +7,5 @@ type ProductRepository interface {
 	Count() (int, error)
 	Create(productModels.Product) error
 	FindByID(id string) (productModels.Product, error)
+	DeleteByID(id string) error
 }

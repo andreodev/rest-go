@@ -131,3 +131,5 @@ func getPositiveQueryInt(r *http.Request, key string, defaultValue int) (int, er
 
 	return parsed, nil
 }
+
+func (h Handlers) deleteProductByID(w)
