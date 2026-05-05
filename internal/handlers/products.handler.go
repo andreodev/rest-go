@@ -16,6 +16,7 @@ func (h Handlers) registerProductEndpoints() {
 	http.HandleFunc("GET /products", h.getAllProducts)
 	http.HandleFunc("POST /products", h.createProduct)
 	http.HandleFunc("GET /products/{id}", h.getProductByID)
+	http.HandleFunc("DELETE /products/{id}", h.deleteProductByID)
 }
 
 func (h Handlers) getAllProducts(w http.ResponseWriter, r *http.Request) {
@@ -132,4 +133,29 @@ func getPositiveQueryInt(r *http.Request, key string, defaultValue int) (int, er
 	return parsed, nil
 }
 
-func (h Handlers) deleteProductByID(w)
+func (h Handlers) deleteProductByID(w http.ResponseWriter, r *http.Request) {
+	id, err := getProductIDFromRequest(r)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(models.ErrorResponse{Reason: err.Error()})
+
+		return
+	}
+
+	if err := h.useCases.Products.DeleteByID(id.String()); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(models.ErrorResponse{Reason: "products not found"})
+			return
+		}
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(models.ErrorResponse{Reason: err.Error()})
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(productModels.ProductDeleteResponse{
+		Message: "product deleted successfully",
+		ID:      id,
+	})
+}

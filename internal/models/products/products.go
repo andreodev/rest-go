@@ -38,3 +38,8 @@ type ProductByIDResponse struct {
 	Description string    `json:"description"`
 	CreatedAt   string    `json:"created_at"`
 }
+
+type ProductDeleteResponse struct {
+	ID      uuid.UUID `json:"id"`
+	Message string    `json:"message"`
+}
