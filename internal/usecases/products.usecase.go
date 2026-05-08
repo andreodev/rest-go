@@ -55,7 +55,13 @@ func (p ProductsUseCase) Create(newProduct productModels.CreateProductRequest) (
 		return productModels.CreateProductResponse{}, err
 	}
 
-	return productModels.CreateProductResponse{ID: repoReq.ID}, nil
+	return productModels.CreateProductResponse{
+		ID:          repoReq.ID,
+		NameProduct: repoReq.NameProduct,
+		Price:       repoReq.Price,
+		Description: repoReq.Description,
+		CreatedAt:   repoReq.CreatedAt,
+	}, nil
 }
 
 func (p ProductsUseCase) FindByID(id string) (productModels.Product, error) {

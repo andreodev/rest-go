@@ -50,6 +50,12 @@ func (h Handlers) createProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if err := req.ValidateProduct(); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(models.ErrorResponse{Reason: err.Error()})
+		return
+	}
+
 	resp, err := h.useCases.Products.Create(req)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

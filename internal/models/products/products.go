@@ -1,6 +1,12 @@
 package products
 
-import "github.com/google/uuid"
+import (
+	"errors"
+	"math"
+	"strings"
+
+	"github.com/google/uuid"
+)
 
 type Product struct {
 	ID          uuid.UUID `json:"id"`
@@ -14,6 +20,27 @@ type CreateProductRequest struct {
 	NameProduct string  `json:"name_product"`
 	Price       float64 `json:"price"`
 	Description string  `json:"description"`
+}
+
+func (r CreateProductRequest) ValidateProduct() error {
+
+	if strings.TrimSpace(r.NameProduct) == "" {
+		return errors.New("name product is required")
+	}
+
+	if math.IsNaN(r.Price) || math.IsInf(r.Price, 0) {
+		return errors.New("invalid price")
+	}
+
+	if r.Price <= 0 {
+		return errors.New("price must be greater than zero")
+	}
+
+	if strings.TrimSpace(r.Description) == "" {
+		return errors.New("description product is required")
+	}
+
+	return nil
 }
 
 type GetAllProductsResponse struct {
