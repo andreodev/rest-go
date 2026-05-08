@@ -34,9 +34,18 @@ func (h Handlers) createUser(w http.ResponseWriter, r *http.Request) {
 
 	var req userModels.UserCreateRequest
 
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
+
+	if err := decoder.Decode(&req); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(models.ErrorResponse{Reason: "Invalid request body"})
+		return
+	}
+
+	if err := req.Validate(); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(models.ErrorResponse{Reason: err.Error()})
 		return
 	}
 

@@ -15,7 +15,7 @@ func NewPostgres(db *sql.DB) *Users {
 
 func (u Users) GetAll() ([]userModels.User, error) {
 	rows, err := u.db.Query(`
-		SELECT id, name, email
+		SELECT id, name, email, password
 		FROM users
 		ORDER BY created_at ASC
 	`)
@@ -28,7 +28,7 @@ func (u Users) GetAll() ([]userModels.User, error) {
 
 	for rows.Next() {
 		var user userModels.User
-		if err := rows.Scan(&user.ID, &user.Name, &user.Email); err != nil {
+		if err := rows.Scan(&user.ID, &user.Name, &user.Email, &user.Password); err != nil {
 			return nil, err
 		}
 		users = append(users, user)
@@ -56,9 +56,9 @@ func (u Users) EmailExist(email string) (bool, error) {
 
 func (u *Users) Add(newUser userModels.User) error {
 	_, err := u.db.Exec(`
-		INSERT INTO users (id, name, email)
-		VALUES ($1, $2, $3)
-	`, newUser.ID, newUser.Name, newUser.Email)
+		INSERT INTO users (id, name, email, password)
+		VALUES ($1, $2, $3, $4)
+	`, newUser.ID, newUser.Name, newUser.Email, newUser.Password)
 
 	return err
 }
@@ -87,10 +87,10 @@ func (u *Users) DeleteById(id string) error {
 func (u Users) GetById(id string) (userModels.User, error) {
 	var user userModels.User
 	err := u.db.QueryRow(`
-		SELECT id, name, email
+		SELECT id, name, email, password
 		FROM users
 		WHERE id = $1
-	`, id).Scan(&user.ID, &user.Name, &user.Email)
+	`, id).Scan(&user.ID, &user.Name, &user.Email, &user.Password)
 
 	return user, err
 }

@@ -7,6 +7,7 @@ import (
 	userRepo "rest-go/internal/repositories/users"
 
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UsersUseCase struct {
@@ -39,10 +40,21 @@ func (u UsersUseCase) Add(newUser userModels.UserCreateRequest) (uuid.UUID, erro
 		return uuid.Nil, errors.New("email already exist")
 	}
 
+	hash, err := bcrypt.GenerateFromPassword(
+		[]byte(newUser.Password),
+		bcrypt.DefaultCost,
+	)
+
+	if err != nil {
+		slog.Error("failed to hash password", "email", newUser.Email, "err", err)
+		return uuid.Nil, err
+	}
+
 	repoReq := userModels.User{
-		ID:    uuid.New(),
-		Name:  newUser.Name,
-		Email: newUser.Email,
+		ID:       uuid.New(),
+		Name:     newUser.Name,
+		Email:    newUser.Email,
+		Password: string(hash),
 	}
 
 	if err := u.repo.Add(repoReq); err != nil {

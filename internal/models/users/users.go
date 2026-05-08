@@ -1,17 +1,41 @@
 package users
 
-import "github.com/google/uuid"
+import (
+	"errors"
+	"strings"
+
+	"github.com/google/uuid"
+)
 
 type User struct {
-	ID    uuid.UUID
-	Name  string
-	Email string
+	ID       uuid.UUID
+	Name     string
+	Email    string
+	Password string
 }
 
 type UserCreateRequest struct {
-	Name  string `json:"name"`
-	Email string `json:"email"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
+
+func (r UserCreateRequest) Validate() error {
+	if strings.TrimSpace(r.Name) == "" {
+		return errors.New("name is required")
+	}
+
+	if strings.TrimSpace(r.Email) == "" {
+		return errors.New("email is required")
+	}
+
+	if strings.TrimSpace(r.Password) == "" {
+		return errors.New("password is required")
+	}
+
+	return nil
+}
+
 type UserCreateResponse struct {
 	NewUserID uuid.UUID `json:"newUserId"`
 }
