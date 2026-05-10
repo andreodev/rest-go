@@ -15,11 +15,12 @@ import (
 )
 
 func (h Handlers) registerProductEndpoints() {
-	http.HandleFunc("GET /products", h.getAllProducts)
-	http.HandleFunc("POST /products", h.createProduct)
-	http.HandleFunc("PUT /products/{id}", h.updateProductByID)
-	http.HandleFunc("GET /products/{id}", h.getProductByID)
-	http.HandleFunc("DELETE /products/{id}", h.deleteProductByID)
+	http.HandleFunc("GET /products", h.requireAuth(h.getAllProducts))
+	http.HandleFunc("GET /products/", h.requireAuth(h.getAllProducts))
+	http.HandleFunc("POST /products", h.requireAuth(h.createProduct))
+	http.HandleFunc("PUT /products/{id}", h.requireAuth(h.updateProductByID))
+	http.HandleFunc("GET /products/{id}", h.requireAuth(h.getProductByID))
+	http.HandleFunc("DELETE /products/{id}", h.requireAuth(h.deleteProductByID))
 }
 
 func (h Handlers) getAllProducts(w http.ResponseWriter, r *http.Request) {

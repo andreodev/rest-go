@@ -14,6 +14,11 @@ type User struct {
 	Password string
 }
 
+type UserReponse struct {
+	Name  string `json:"name"`
+	Email string `json:"email"`
+}
+
 type UserCreateRequest struct {
 	Name     string `json:"name"`
 	Email    string `json:"email"`
